@@ -11,7 +11,7 @@ Este projeto tem como objetivo explorar o uso de interrupções no microcontrola
 
 ## 🎥 Entrega e Demonstração
 **Vídeo de demonstração:**
-  - [Ver Video]()
+  - [Ver Video](https://drive.google.com/file/d/1Xj484nn3jYWexpGraGvilpbuFuv9lzPQ/view?usp=sharing)
 
 ## 🛠️ Componentes Utilizados
 | Componente  | Pino GPIO |
@@ -39,9 +39,10 @@ Os botões utilizam `pull-up` interno para evitar leituras flutuantes.
 1. Instale o **Raspberry Pi Pico SDK**.
 2. Clone este repositório:
    ```sh
+   https://github.com/wesiley/interrupcao_bitdoglab
    ```
 3. Compile o código usando CMake e GCC para ARM.
 4. Copie o arquivo `.uf2` gerado para a placa BitDogLab.
 
 ## 📩 Contato
-Criado por **Everton Espedito**. Para dúvidas ou sugestões, entre em contato!
+Criado por **Wesley Rodrigues**. Para dúvidas ou sugestões, entre em contato!
