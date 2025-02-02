@@ -14,6 +14,7 @@
 #define WS2812_PIN 7
 #define NUM_LEDS 25  // Matriz 5x5 de LEDs WS2812
 
+
 // Variáveis globais
 volatile int current_number = 0;  // Número atual exibido na matriz de LEDs
 volatile uint32_t last_press_time = 0;  // Último tempo de pressionamento do botão
@@ -29,17 +30,17 @@ const uint32_t patterns[10][25] = {
      1, 1, 1, 1, 1},
 
     // 1
-    {0, 0, 1, 0, 0,
+    {0, 1, 1, 1, 0,
+     0, 0, 1, 0, 0,
+     0, 0, 1, 0, 0,
      0, 1, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 1, 1, 1, 0},
+     0, 0, 1, 0, 0},
 
     // 2
     {1, 1, 1, 1, 1,
-     0, 0, 0, 0, 1,
-     1, 1, 1, 1, 1,
      1, 0, 0, 0, 0,
+     1, 1, 1, 1, 1,
+     0, 0, 0, 0, 1,
      1, 1, 1, 1, 1},
 
     // 3
@@ -50,32 +51,32 @@ const uint32_t patterns[10][25] = {
      1, 1, 1, 1, 1},
 
     // 4
-    {1, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     1, 1, 1, 1, 1,
+    {1, 0, 0, 0, 0,
      0, 0, 0, 0, 1,
-     0, 0, 0, 0, 1},
+     1, 1, 1, 1, 1,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 1},
 
     // 5
     {1, 1, 1, 1, 1,
-     1, 0, 0, 0, 0,
-     1, 1, 1, 1, 1,
      0, 0, 0, 0, 1,
+     1, 1, 1, 1, 1,
+     1, 0, 0, 0, 0,
      1, 1, 1, 1, 1},
 
     // 6
     {1, 1, 1, 1, 1,
-     1, 0, 0, 0, 0,
-     1, 1, 1, 1, 1,
      1, 0, 0, 0, 1,
+     1, 1, 1, 1, 1,
+     1, 0, 0, 0, 0,
      1, 1, 1, 1, 1},
 
     // 7
-    {1, 1, 1, 1, 1,
-     0, 0, 0, 0, 1,
-     0, 0, 0, 1, 0,
+    {0, 0, 0, 1, 0,
      0, 0, 1, 0, 0,
-     0, 1, 0, 0, 0},
+     0, 1, 0, 0, 0,
+     0, 0, 0, 0, 1,
+     1, 1, 1, 1, 1},
 
     // 8
     {1, 1, 1, 1, 1,
@@ -86,11 +87,12 @@ const uint32_t patterns[10][25] = {
 
     // 9
     {1, 1, 1, 1, 1,
-     1, 0, 0, 0, 1,
-     1, 1, 1, 1, 1,
      0, 0, 0, 0, 1,
+     1, 1, 1, 1, 1,
+     1, 0, 0, 0, 1,
      1, 1, 1, 1, 1}
 };
+
 
 // Função para piscar o LED vermelho
 void blink_red_led() {
@@ -106,10 +108,11 @@ void display_number(int number) {
 
     // Define as cores dos LEDs com base no padrão
     for (int i = 0; i < NUM_LEDS; i++) {
-        uint32_t color = (patterns[number][i] == 1) ? 0xFF0000 : 0x000000;  // Vermelho ou apagado
+        uint32_t color = (patterns[number][i] == 1) ? 0x0000FF : 0x000000;  // Azul ou apagado
         pio_sm_put_blocking(pio0, 0, color << 8u);  // Envia o valor para o WS2812
     }
 }
+
 
 void gpio_irq_handler(uint gpio, uint32_t events)
 {
@@ -152,8 +155,8 @@ int main() {
     gpio_init(BUTTON_B_PIN);
     gpio_set_dir(BUTTON_A_PIN, GPIO_IN);
     gpio_set_dir(BUTTON_B_PIN, GPIO_IN);
-    gpio_pull_up(BUTTON_A_PIN);
-    gpio_pull_up(BUTTON_B_PIN);
+    gpio_pull_up(BUTTON_A_PIN); // Ativa pull-up para evitar leituras flutuantes
+    gpio_pull_up(BUTTON_B_PIN); // Ativa pull-up para evitar leituras flutuantes
 
 
     gpio_set_irq_enabled_with_callback(BUTTON_A_PIN, GPIO_IRQ_EDGE_FALL, true, gpio_irq_handler);
@@ -165,7 +168,7 @@ int main() {
     uint offset = pio_add_program(pio, &ws2812_program);
     ws2812_program_init(pio, sm, offset, WS2812_PIN, 800000, false);
 
-    // Timer para piscar o LED vermelho
+    // Timer para piscar o LED vermelho 5 vezes por segundo
     struct repeating_timer timer;
     add_repeating_timer_ms(200, (repeating_timer_callback_t)blink_red_led, NULL, &timer);
 
